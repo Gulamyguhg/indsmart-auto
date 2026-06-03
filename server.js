@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const puppeteer = require('puppeteer');
 const axios = require('axios');
@@ -7,15 +6,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ---------- HARDCODED TELEGRAM CREDENTIALS ----------
-const BOT_TOKEN = '8956593370:AAHT5wVCVoU_Vfkn7eJ79Ojlgpe0A30Ytbk';  // <-- tera token
-const CHAT_ID = '8261652786';  // <-- tera chat id
+// ---------- YOUR TELEGRAM CREDENTIALS (HARDCODED) ----------
+const BOT_TOKEN = '8956593370:AAHT5wVCVoU_Vfkn7eJ79Ojlgpe0A30Ytbk';
+const CHAT_ID = '8261652786';
 
-// ---------- REST OF CONFIG ----------
-const TARGET_URL = process.env.TARGET_URL || 'https://indsmart.com/register';
-const INPUT_SELECTOR = process.env.INPUT_SELECTOR || '#mobile_number';
-const BUTTON_SELECTOR = process.env.BUTTON_SELECTOR || '#register_btn';
-const SUCCESS_TEXT = process.env.SUCCESS_TEXT || 'Registration successful';
+// ---------- INDSMART CONFIGURATION (change if needed) ----------
+const TARGET_URL = 'https://indsmart.com/register';
+const INPUT_SELECTOR = '#mobile_number';
+const BUTTON_SELECTOR = '#register_btn';
+const SUCCESS_TEXT = 'Registration successful';
 
 let isRunning = false;
 let numberQueue = [];
@@ -30,7 +29,7 @@ app.post('/start', (req, res) => {
     currentIndex = 0;
     isRunning = true;
     res.json({ status: 'started', total: numberQueue.length });
-    runAutomation();
+    runAutomation(); // non-blocking
 });
 
 app.post('/stop', (req, res) => {
@@ -48,14 +47,19 @@ async function sendToTelegram(phone) {
             chat_id: CHAT_ID,
             text: `✅ Registered: ${phone}`
         });
-        console.log(`📨 TG sent: ${phone}`);
-    } catch(e) { console.error('TG error:', e.message); }
+        console.log(`📨 Telegram sent: ${phone}`);
+    } catch(e) {
+        console.error('Telegram error:', e.message);
+    }
 }
 
 async function runAutomation() {
     let browser;
     try {
-        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
         while (isRunning && currentIndex < numberQueue.length) {
             const number = numberQueue[currentIndex];
             console.log(`🔁 ${currentIndex+1}/${numberQueue.length}: ${number}`);
@@ -88,7 +92,7 @@ async function runAutomation() {
     }
 }
 
-// ---------- FRONTEND (same as before) ----------
+// ---------- FRONTEND (Embedded beautiful UI) ----------
 app.get('/', (req, res) => {
     res.send(`<!DOCTYPE html>
 <html>
@@ -144,8 +148,8 @@ app.get('/', (req, res) => {
 <body>
 <div class="glass">
 <div class="card">
-    <h1>📱 Indsmart Auto <span class="badge">v2.0</span></h1>
-    <div class="sub">Automatic registration with Telegram alerts – just paste numbers</div>
+    <h1>📱 Indsmart Auto <span class="badge">Ready</span></h1>
+    <div class="sub">Automatic registration with Telegram alerts</div>
     <textarea id="numbers" rows="4" placeholder="Enter mobile numbers (one per line or comma separated)&#10;9876543210&#10;9876543211,9876543212"></textarea>
     <div class="btn-group">
         <button id="startBtn" class="btn-start">✨ Start Automation</button>
@@ -153,7 +157,7 @@ app.get('/', (req, res) => {
     </div>
     <div id="statusBox" class="status-card">⚪ Status: Idle</div>
     <div id="logArea" class="log">📝 Log will appear here...</div>
-    <footer>⚡ Backend runs on Render/Railway • Telegram bot embedded</footer>
+    <footer>⚡ Backend running on Render | Telegram bot active</footer>
 </div>
 </div>
 <script>
