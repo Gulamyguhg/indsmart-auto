@@ -7,9 +7,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ---------- CONFIG (change if needed) ----------
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
+// ---------- HARDCODED TELEGRAM CREDENTIALS ----------
+const BOT_TOKEN = '8956593370:AAHT5wVCVoU_Vfkn7eJ79Ojlgpe0A30Ytbk';  // <-- tera token
+const CHAT_ID = '8261652786';  // <-- tera chat id
+
+// ---------- REST OF CONFIG ----------
 const TARGET_URL = process.env.TARGET_URL || 'https://indsmart.com/register';
 const INPUT_SELECTOR = process.env.INPUT_SELECTOR || '#mobile_number';
 const BUTTON_SELECTOR = process.env.BUTTON_SELECTOR || '#register_btn';
@@ -28,7 +30,7 @@ app.post('/start', (req, res) => {
     currentIndex = 0;
     isRunning = true;
     res.json({ status: 'started', total: numberQueue.length });
-    runAutomation(); // background
+    runAutomation();
 });
 
 app.post('/stop', (req, res) => {
@@ -40,9 +42,7 @@ app.get('/status', (req, res) => {
     res.json({ isRunning, current: currentIndex, total: numberQueue.length });
 });
 
-// ---------- TELEGRAM SENDER ----------
 async function sendToTelegram(phone) {
-    if (!BOT_TOKEN || !CHAT_ID) return;
     try {
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             chat_id: CHAT_ID,
@@ -52,7 +52,6 @@ async function sendToTelegram(phone) {
     } catch(e) { console.error('TG error:', e.message); }
 }
 
-// ---------- AUTOMATION ENGINE ----------
 async function runAutomation() {
     let browser;
     try {
@@ -89,7 +88,7 @@ async function runAutomation() {
     }
 }
 
-// ---------- FRONTEND (Beautiful UI) ----------
+// ---------- FRONTEND (same as before) ----------
 app.get('/', (req, res) => {
     res.send(`<!DOCTYPE html>
 <html>
@@ -154,7 +153,7 @@ app.get('/', (req, res) => {
     </div>
     <div id="statusBox" class="status-card">⚪ Status: Idle</div>
     <div id="logArea" class="log">📝 Log will appear here...</div>
-    <footer>⚡ Backend runs on Render/Railway • Telegram bot required</footer>
+    <footer>⚡ Backend runs on Render/Railway • Telegram bot embedded</footer>
 </div>
 </div>
 <script>
